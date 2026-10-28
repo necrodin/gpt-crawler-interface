@@ -49,6 +49,8 @@
     "start:cli": "cross-env NODE_ENV=development npm run build && node dist/src/cli.js",
     "start:dev": "cross-env NODE_ENV=development npm run build && node dist/src/main.js",
     "start:prod": "node dist/src/main.js",
+    "start:web": "npm run build && node dist/src/webserver.js",
+    "start:webdev": "npm run build && node dist/src/webserver-dev.js",
     "test": "echo \"No test specified, please create tests.\" && exit 0",
     "build": "tsc",
     "fmt": "prettier --write .",
