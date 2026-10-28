@@ -36,7 +36,7 @@ export const configSchema = z.object({
    * Don't crawl more than this many pages
    * @default 50
    */
-  maxPagesToCrawl: z.number().int().positive(),
+  maxPagesToCrawl: z.number().int().nonnegative(),
   /**
    * File name for the finished data
    * @default "output.json"
@@ -80,11 +80,11 @@ export const configSchema = z.object({
   /** Optional maximum file size in megabytes to include in the output file
    * @example 1
    */
-  maxFileSize: z.number().int().positive().optional(),
+  maxFileSize: z.number().int().nonnegative().optional(),
   /** Optional maximum number tokens to include in the output file
    * @example 5000
    */
-  maxTokens: z.number().int().positive().optional(),
+  maxTokens: z.number().int().nonnegative().optional(),
 });
 
 export type Config = z.infer<typeof configSchema>;

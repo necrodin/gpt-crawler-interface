@@ -1,11 +1,16 @@
 // For more information, see https://crawlee.dev/
 import { Configuration, PlaywrightCrawler, downloadListOfUrls } from "crawlee";
-import { readFile, writeFile } from "fs/promises";
+import { readFile, writeFile, mkdir } from "fs/promises";
 import { glob } from "glob";
 import { Config, configSchema } from "./config.js";
 import { Page } from "playwright";
 import { isWithinTokenLimit } from "gpt-tokenizer";
 import { PathLike } from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 let pageCounter = 0;
 let crawler: PlaywrightCrawler;
@@ -56,6 +61,11 @@ export async function crawl(config: Config) {
     // browser controlled by the Playwright library.
     crawler = new PlaywrightCrawler(
       {
+        launchContext: {
+          launchOptions: {
+            executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+          },
+        },
         // Use the requestHandler to process each of the crawled pages.
         async requestHandler({ request, page, enqueueLinks, log, pushData }) {
           const title = await page.title();
@@ -159,7 +169,28 @@ export async function crawl(config: Config) {
 }
 
 export async function write(config: Config) {
-  let nextFileNameString: PathLike = "";
+  // Generate filename from domain if default is used
+  let outputFileName = config.outputFileName;
+  if (outputFileName === 'output.json') {
+    try {
+      const urlObj = new URL(config.url);
+      const domain = urlObj.hostname.replace('www.', '');
+      // Get just the first part of the domain (e.g., "google" from "google.com")
+      const domainName = domain.split('.')[0];
+      outputFileName = `${domainName}.json`;
+    } catch (e) {
+      outputFileName = 'output.json';
+    }
+  }
+  
+  // Ensure output directory exists
+  const outputDir = path.join(__dirname, "../../output");
+  await mkdir(outputDir, { recursive: true });
+  
+  // Create output path with domain-based filename
+  const nextFileNameString = path.join(outputDir, outputFileName);
+  
+  // Read and process all crawled data
   const jsonFiles = await glob("storage/datasets/default/*.json", {
     absolute: true,
   });
@@ -176,17 +207,20 @@ export async function write(config: Config) {
   const getStringByteSize = (str: string): number =>
     Buffer.byteLength(str, "utf-8");
 
-  const nextFileName = (): string =>
-    `${config.outputFileName.replace(/\.json$/, "")}-${fileCounter}.json`;
+  const nextFileName = (): string => {
+    // If we need to split files, use domain-name-1.json, domain-name-2.json, etc.
+    const baseName = outputFileName.replace(/\.json$/, "");
+    return `${baseName}-${fileCounter}.json`;
+  };
 
   const writeBatchToFile = async (): Promise<void> => {
-    nextFileNameString = nextFileName();
+    const filePath = path.join(outputDir, nextFileName());
     await writeFile(
-      nextFileNameString,
+      filePath,
       JSON.stringify(currentResults, null, 2),
     );
     console.log(
-      `Wrote ${currentResults.length} items to ${nextFileNameString}`,
+      `Wrote ${currentResults.length} items to ${filePath}`,
     );
     currentResults = [];
     currentSize = 0;
@@ -199,26 +233,38 @@ export async function write(config: Config) {
     data: Record<string, any>,
   ): Promise<void> => {
     const contentString: string = JSON.stringify(data);
-    const tokenCount: number | false = isWithinTokenLimit(
-      contentString,
-      config.maxTokens || Infinity,
-    );
+    
+    // If maxTokens is 0 or Infinity, skip token checking and just add all data
+    if (config.maxTokens === 0 || config.maxTokens === Infinity) {
+      currentResults.push(data);
+    } else {
+      // Only check token limit if maxTokens > 0
+      const tokenCount: number | false = isWithinTokenLimit(
+        contentString,
+        config.maxTokens!,
+      );
 
-    if (typeof tokenCount === "number") {
-      if (estimatedTokens + tokenCount > config.maxTokens!) {
-        // Only write the batch if it's not empty (something to write)
-        if (currentResults.length > 0) {
-          await writeBatchToFile();
+      if (typeof tokenCount === "number") {
+        if (estimatedTokens + tokenCount > config.maxTokens!) {
+          // Only write the batch if it's not empty (something to write)
+          if (currentResults.length > 0) {
+            await writeBatchToFile();
+          }
+          // Since the addition of a single item exceeded the token limit, halve it.
+          estimatedTokens = Math.floor(tokenCount / 2);
+          currentResults.push(data);
+        } else {
+          currentResults.push(data);
+          estimatedTokens += tokenCount;
         }
-        // Since the addition of a single item exceeded the token limit, halve it.
-        estimatedTokens = Math.floor(tokenCount / 2);
-        currentResults.push(data);
-      } else {
-        currentResults.push(data);
-        estimatedTokens += tokenCount;
       }
     }
 
+    // If maxFileSize is 0 or Infinity, skip file size checking
+    if (config.maxFileSize === 0 || config.maxFileSize === Infinity) {
+      return;
+    }
+    
     currentSize += getStringByteSize(contentString);
     if (currentSize > maxBytes) {
       await writeBatchToFile();
@@ -233,8 +279,17 @@ export async function write(config: Config) {
   }
 
   // Check if any remaining data needs to be written to a file.
+  // If we've already written batches (fileCounter > 1), write final batch
+  // Otherwise, write directly to domain-named file
   if (currentResults.length > 0) {
-    await writeBatchToFile();
+    if (fileCounter === 1) {
+      // No splits needed, write directly to domain-named file
+      await writeFile(nextFileNameString, JSON.stringify(currentResults, null, 2));
+      console.log(`Wrote final ${currentResults.length} items to ${nextFileNameString}`);
+    } else {
+      // Write final batch with numbered filename
+      await writeBatchToFile();
+    }
   }
 
   return nextFileNameString;

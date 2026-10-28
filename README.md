@@ -15,6 +15,7 @@ Crawl a site to generate knowledge files to create your own custom GPT from one 
 ![Gif showing the crawl run](https://github.com/BuilderIO/gpt-crawler/assets/844291/feb8763a-152b-4708-9c92-013b5c70d2f2)
 
 - [Example](#example)
+- [Web Interface](#web-interface)
 - [Get started](#get-started)
   - [Running locally](#running-locally)
     - [Clone the repository](#clone-the-repository)
@@ -38,6 +39,70 @@ This project crawled the docs and generated the file that I uploaded as the basi
 [Try it out yourself](https://chat.openai.com/g/g-kywiqipmR-builder-io-assistant) by asking questions about how to integrate Builder.io into a site.
 
 > Note that you may need a paid ChatGPT plan to access this feature
+
+## Web Interface
+
+This project includes a modern web interface for configuring and running web crawls with a user-friendly UI.
+
+### Features
+- 🌐 **Web-based interface** - Accessible via browser at `http://localhost:3001`
+- 🎯 **Domain-based output naming** - Output files automatically named after the domain hostname (e.g., `google.json` from `https://www.google.com`)
+- 📝 **JSON and Markdown export** - Download data in both JSON and Markdown formats
+- 🎨 **Modern UI** - Built with Tailwind CSS for a clean, responsive design
+- 🌍 **English language** - All interface text in English
+
+### How to use
+
+The web interface requires the following scripts in your `package.json`:
+
+```json
+{
+  "scripts": {
+    "start:web": "npm run build && node dist/src/webserver.js",
+    "start:webdev": "npm run build && node dist/src/webserver-dev.js"
+  }
+}
+```
+
+1. **Start the web server**:
+   ```bash
+   npm run start:web
+   ```
+
+2. **Open your browser** and navigate to `http://localhost:3001`
+
+3. **Configure your crawl**:
+   - **Start URL**: Enter the URL to start crawling (e.g., `https://example.com`)
+   - **Match Pattern**: Enter the pattern to match links (e.g., `https://example.com/**`)
+   - **Selector**: CSS selector or XPath to extract content (default: `body`)
+   - **Max Pages**: Maximum number of pages to crawl
+   - **Output File**: Output filename (optional - auto-named by domain)
+
+4. **Start Crawl**: Click "Start Crawl" to begin the crawling process
+
+5. **Download Results**: Once crawling is complete, download your data as JSON or Markdown
+
+> Note: If you don't refresh your browser and the UI doesn't update, try **Ctrl+F5** (hard refresh) to clear the cache.
+
+### Web Server Scripts
+
+Add these scripts to your `package.json`:
+
+```json
+{
+  "scripts": {
+    "start:web": "npm run build && node dist/src/webserver.js",
+    "start:webdev": "tsc --watch & node esbuild-watch.js"
+  }
+}
+```
+
+Then run:
+```bash
+npm run start:web
+```
+
+---
 
 ## Get started
 
