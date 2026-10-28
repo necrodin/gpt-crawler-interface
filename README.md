@@ -24,9 +24,6 @@
 
 These are additions to the original project, **not a replacement for Builder.io's crawling engine**.
 
-## Screenshot
-
-![Browser-based crawl configuration](assets/ss.png)
 
 ## Requirements
 
@@ -135,10 +132,14 @@ This is an independent community modification, not an official Builder.io releas
 
 ## License
 
-This project is open source and available under the **MIT License**. Free to use, modify, and distribute as you wish.
+**GPT Crawler with Web Interface is free and open-source software.**
 
-**Original crawler code:** © 2023 BuilderIO (ISC License)  
-**Web interface additions:** © 2026 necrodin (MIT License)
+This repository is distributed under the **ISC License**, a permissive open-source license that permits anyone to use, copy, modify, distribute, and commercially use the software, subject to retaining the applicable copyright and permission notices. See the repository’s [`License`](License) file for the complete terms.
+
+- **Original GPT Crawler:** © 2023 BuilderIO and its contributors — [Builder.io / GPT Crawler](https://github.com/BuilderIO/gpt-crawler), ISC License.
+- **Web interface and additional development:** © 2026 [necrodin](https://github.com/necrodin) — distributed as part of this open-source repository under the ISC License.
+
+This is an independent community extension and is not officially affiliated with or endorsed by Builder.io. Original copyright and license notices must be preserved when redistributing the software.
 
 ---
 
