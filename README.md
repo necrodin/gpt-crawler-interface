@@ -1,5 +1,7 @@
 # GPT Crawler with Web Interface
 
+![Web Interface Screenshot](assets/ss.png)
+
 A modern web interface for the gpt-crawler project, enabling easy configuration and management of web crawling operations through a user-friendly browser-based interface.
 
 ## Features
@@ -100,7 +102,7 @@ The crawler will generate a file in the `output/` directory, automatically named
 
 ## License
 
-ISC
+MIT License - Free to use and modify as you wish
 
 ## Original Project
 
