@@ -135,9 +135,10 @@ This is an independent community modification, not an official Builder.io releas
 
 ## License
 
-This repository contains code derived from Builder.io's GPT Crawler and is distributed under the **ISC License**. See the repository's [`License`](License) file for the complete license notice and original copyright attribution.
+This project is open source and available under the **MIT License**. Free to use, modify, and distribute as you wish.
 
-**Original copyright:** © 2023 BuilderIO (as stated in the repository's license file).
+**Original crawler code:** © 2023 BuilderIO (ISC License)  
+**Web interface additions:** © 2026 necrodin (MIT License)
 
 ---
 
