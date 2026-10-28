@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # GPT Crawler <!-- omit from toc -->
 
 <!-- Keep these links. Translations will automatically update with the README. -->
@@ -234,3 +235,6 @@ Know how to make this project better? Send a PR!
        </picture>
    </a>
 </p>
+# GPT Crawler with Web Interface
+
+This is a modified version of gpt-crawler with a built-in web interface for easy configuration and management.
